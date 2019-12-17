@@ -32,7 +32,15 @@ namespace Session21
                 AssetSNTxt.Text = query.AssetSN;
                 AssetNameTxt.Text = query.AssetName;
                 DeptTxt.Text = query.DepartmentLocation.Department.Name;
-                StartDate.Value = DateTime.Now;
+                var query3 = db.EmergencyMaintenances.Where(x => x.ID == IDss).FirstOrDefault();
+                if(query3.EMStartDate != null)
+                {
+                    StartDate.Text = query3.EMStartDate.ToString();
+                }
+                else
+                {
+                    StartDate.Value = DateTime.Now;
+                }
                 var query2 = db.Parts.ToList();
                 foreach (var item in query2)
                 {
@@ -41,7 +49,18 @@ namespace Session21
                 //var query3 = db.ChangedParts.Where(x => x.EmergencyMaintenanceID == IDss).ToList();
                 dataGridView1.DataSource = DT(partsList);
                 dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+                links();
             }
+        }
+
+        private void links()
+        {
+            DataGridViewLinkColumn links = new DataGridViewLinkColumn();
+
+            links.UseColumnTextForLinkValue = true;
+            links.HeaderText = "Actions";
+            links.Text = "Remove";
+            dataGridView1.Columns.Add(links);
         }
 
         private void AddtoListBtn_Click(object sender, EventArgs e)
@@ -54,6 +73,16 @@ namespace Session21
                 var query = db.Parts.Where(x => x.Name == name).FirstOrDefault();
                 part.PartID = query.ID;
                 part.EmergencyMaintenanceID = IDss;
+
+                var query2 = db.ChangedParts.Where(x => x.EmergencyMaintenanceID == IDss && x.PartID == query.ID);
+                foreach(var item in query2)
+                {
+                    var difference = TimeSpan.Parse((EndDate.Value - item.EmergencyMaintenance.EMStartDate).ToString()).Days;
+                    if ((long)item.Part.EffectiveLife > (long)difference)
+                    {
+                        MessageBox.Show("You have a item which still has life!");
+                    }
+                }
                 partsList.Add(part);
                 dataGridView1.DataSource = DT(partsList);
                 dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
@@ -107,6 +136,37 @@ namespace Session21
             {
                 MessageBox.Show("Cannot be changed untill technician note has been edited!");
             }
+        }
+
+        private void CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            var colIndex = e.ColumnIndex;
+            if (colIndex == 0)
+            {
+                partsList.RemoveAt(e.RowIndex);
+                dataGridView1.DataSource = DT(partsList);
+                dataGridView1.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+
+            }
+            
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            
+        }
+
+        private void StartDate_ValueChanged(object sender, EventArgs e)
+        {
+            using(Session2Entities db = new Session2Entities())
+            {
+                var item = db.EmergencyMaintenances.Where(x => x.ID == IDss).FirstOrDefault();
+                if (StartDate.Value < item.EMReportDate)
+                {
+                    MessageBox.Show("Invalid Start Date: Start Date cannot be before reporting date!");
+                }
+            }
+            
         }
 
         DataTable DT(List<ChangedPart> parts)

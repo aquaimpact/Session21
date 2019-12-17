@@ -207,6 +207,7 @@
             this.StartDate.Name = "StartDate";
             this.StartDate.Size = new System.Drawing.Size(200, 26);
             this.StartDate.TabIndex = 17;
+            this.StartDate.ValueChanged += new System.EventHandler(this.StartDate_ValueChanged);
             // 
             // EndDate
             // 
@@ -264,6 +265,8 @@
             this.dataGridView1.RowTemplate.Height = 28;
             this.dataGridView1.Size = new System.Drawing.Size(748, 94);
             this.dataGridView1.TabIndex = 5;
+            this.dataGridView1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.CellClick);
+            this.dataGridView1.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellContentClick);
             // 
             // SubmitBtn
             // 
