@@ -44,7 +44,7 @@ namespace Session21
             {
                 using (Session2Entities db = new Session2Entities())
                 {
-                    if (item.EMEndDate != null)
+                    if (item.EMEndDate == null)
                     {
                         DataRow dataRow = table.NewRow();
                         dataRow["Asset SN"] = item.Asset.AssetSN;

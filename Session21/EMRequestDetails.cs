@@ -89,7 +89,6 @@ namespace Session21
                 em.EMStartDate = StartDate.Value;
                 em.EMEndDate = EndDate.Value;
                 em.EMTechnicianNote = NoteTxt.Text.Trim();
-                db.EmergencyMaintenances.Add(em);
                 try
                 {
                     db.SaveChanges();
@@ -120,7 +119,9 @@ namespace Session21
                 using (Session2Entities db = new Session2Entities())
                 {
                     DataRow dr = dt.NewRow();
-                    dr["Part Name"] = item.PartID;
+                    var id = item.PartID;
+                    var query = db.Parts.Where(x => x.ID == id).First();
+                    dr["Part Name"] = query.Name;
                     dr["Amount"] = item.Amount;
                     dt.Rows.Add(dr);
                 }
